@@ -18,7 +18,109 @@ This repository contains code for controlling room lighting based on the light i
 3. **Application Layer:** This layer contains the main application logic, including reading the light intensity from the LDR using ADC, processing the data to determine the light intensity percentage, and controlling the LED based on the threshold value.
 
 4. **Utilities:** Utilities layer may include helper functions, macros, or data structures used across the application to improve code modularity and reusability.
+**code**
 
+```c
+
+#include <avr/io.h>
+/*********************MCAL******************************/
+#include "DIO_interface.h"
+#include "ADC_interface.h"
+/*********************HAL*******************************/
+#include "LCD.h"
+#include "KPD.h"
+
+/*********************UTILTES_TYPES*********************/
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+// Define constants
+#define F_CPU 16000000UL
+#define THRESHOLD_MAX 1023
+// Include delay library
+#include <util/delay.h>
+
+
+void initialize();
+void Light_Control(u16 AnalogValue, u16 Threshold);
+u16 Key_Press(void);
+int main(void)
+{
+	//CODE sequence:
+	//init(): Initializes necessary peripherals.
+	//while(1): Infinite loop for continuous operation.
+	//Reads keypad input to set the threshold value.
+	//Reads the LDR value using ADC.
+	//Displays the percentage of light on the LCD.
+	//Adapts room light based on the ADC value.
+	//Adds a delay to prevent flickering.
+	
+	// Initialize hardware peripheral components
+	initialize();
+	
+	// Define variables
+	u16 Digital;
+	u16 AnalogValue;
+	u16 percentage;
+	u16 Threshold;
+    /* Replace with your application code */
+    while (1) 
+    {
+		u8 myString1[] = "Enter threshold:";
+		LCD_voidWriteString(myString1);
+		 // Read threshold value from keypad
+		Threshold =Key_Press();
+		 // Read light value from LDR using ADC
+		ADC_voidGetDigitalValue(ADC_CHANNEL_0,&Digital);
+		
+		// Calculate percentage of light
+		percentage = Digital / THRESHOLD_MAX * 100;
+		// Display percentage on LCD
+		LCD_voidWriteString("Light: ");
+		LCD_voidWriteString(percentage);
+		LCD_voidWriteString("%");
+		// If light is above threshold, turn on LED
+		Light_Control( percentage, Threshold);
+		_delay_ms(2000);
+    }
+	
+}
+
+void initialize() {
+	// Initialize components
+	KPD_INIT();
+	LCD_voidInit();
+	ADC_voidInit(ADC_REFERENCE_INTRNAL);
+	
+	// Initialize LDR pin direction
+	DIO_voidSetPinDirection (DIO_PORTA,DIO_PIN2,DIO_PIN_INPUT);
+	// Initialize LED pin direction
+	DIO_voidSetPinDirection (DIO_PORTA,DIO_PIN7,DIO_PIN_OUTPUT);
+	
+}
+u16 Key_Press(void)
+{
+	u16 threshold; 
+	u8 Local_u8PressedKey =  KPD_u8GetPressedKey();
+	if (Local_u8PressedKey  != '\0' && Local_u8PressedKey >= '0' && Local_u8PressedKey <= '9') {
+		threshold = threshold * 10 + (Local_u8PressedKey - '0');
+	}
+	return threshold;
+}
+
+//Light Control
+void Light_Control(u16 AnalogValue, u16 Threshold)
+{
+	if(AnalogValue > Threshold)
+	{
+		DIO_voidSetPinValue(DIO_PORTA, DIO_PIN7, DIO_PIN_LOW);
+	}
+	else
+	{
+		DIO_voidSetPinValue(DIO_PORTA, DIO_PIN7, DIO_PIN_HIGH);
+	}
+}
+```
 
 
 **Usage:**
