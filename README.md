@@ -9,6 +9,7 @@ This repository contains code for controlling room lighting based on the light i
 4. LCD Display
 5. LED
 6. ADC (Analog to Digital Converter)
+7. [https://example.com/path/to/video.mp4](https://drive.google.com/drive/folders/1I7h5ijISXPHe9K9VA9PL47ZZegNWQlWs?fbclid=IwAR3HJXDM2luzVMnJfu0265pfAqRNAhGNQUj6SpMiMhe4FlRDcuIibmmNQOo)
 
 **Architecture Layers:**
 1. **MCAL (Microcontroller Abstraction Layer):** This layer provides a hardware abstraction interface for the microcontroller peripherals, such as ADC and GPIO, allowing portability across different microcontroller architectures.
